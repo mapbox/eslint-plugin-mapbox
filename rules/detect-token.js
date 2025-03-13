@@ -14,7 +14,8 @@ module.exports = {
     schema: []
   },
   create(context) {
-    const tokenPattern = /\b(?:tk|pk|sk)\.[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+\b/g;
+    const tokenPattern =
+      /\b(?:tk|pk|sk)\.[A-Za-z0-9-_]+\.[A-Za-z0-9-_]{10,}\b/g;
 
     const checkString = (node, value) => {
       const matches = value.match(tokenPattern);
@@ -23,26 +24,21 @@ module.exports = {
         matches.forEach((token) => {
           const parts = token.split('.');
 
-          if (parts.length === 3) {
-            const signature = parts[2];
-            if (signature.length > 10) {
-              context.report({
-                node,
-                messageId: 'forbiddenToken',
-                data: { token },
-                fix(fixer) {
-                  const fixedToken = `${parts[0]}.${parts[1]}.test`;
+          context.report({
+            node,
+            messageId: 'forbiddenToken',
+            data: { token },
+            fix(fixer) {
+              const fixedToken = `${parts[0]}.${parts[1]}.test`;
 
-                  if (node.type === 'JSXText') {
-                    return fixer.replaceText(node, fixedToken);
-                  }
+              if (node.type === 'JSXText') {
+                return fixer.replaceText(node, fixedToken);
+              }
 
-                  const fixedValue = value.replace(token, fixedToken);
-                  return fixer.replaceText(node, JSON.stringify(fixedValue));
-                }
-              });
+              const fixedValue = value.replace(token, fixedToken);
+              return fixer.replaceText(node, JSON.stringify(fixedValue));
             }
-          }
+          });
         });
       }
     };
