@@ -1,4 +1,4 @@
-# eslint-plugin-mapbox-token
+# eslint-plugin-mapbox
 
 This eslint plugin contains custom eslint rules. 
 
